@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {
-  ChakraProvider,
-  Input,
-  theme,
-  Box,
-  Text,
-  VStack,
-  Code,
-  Grid,
-} from '@chakra-ui/react';
+import { ChakraProvider, Input, theme, Box, Text } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
-import { Logo } from './Logo';
 
 function App() {
   const [transactions, setTransactions] = useState('');
@@ -40,10 +30,12 @@ function App() {
   }
 
   function renderDifferentUI() {
-    // Replace this with the UI you want to show after a transaction is inputted
+    let parsed = JSON.parse(transactions);
     return (
       <Box>
-        <Text>Transaction inputted! Display your different UI here.</Text>
+        <Text>{transactions}</Text>
+
+        <Text> {parsed} </Text>
       </Box>
     );
   }
@@ -51,9 +43,7 @@ function App() {
   return (
     <ChakraProvider theme={theme}>
       {isTransactionInputted ? renderDifferentUI() : renderInputUI()}
-      {/* You can also include other components/UI elements */}
       <ColorModeSwitcher />
-      <Logo />
     </ChakraProvider>
   );
 }
