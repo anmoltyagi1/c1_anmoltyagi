@@ -27,6 +27,7 @@ import {
   UnorderedList,
   ListItem,
   useDisclosure,
+  CardHeader,
 } from '@chakra-ui/react';
 
 function App() {
@@ -221,22 +222,23 @@ function App() {
             <ModalCloseButton />
             <ModalBody>
               <UnorderedList listStyleType="none" pl={0}>
-                {Object.entries(rewardRules).map(
-                  ([ruleNumber, ruleDescription]) => (
-                    <ListItem
-                      key={ruleNumber}
-                      borderBottom="1px solid #ccc"
-                      py={2}
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      textAlign="left"
-                    >
+                {Object.entries(rewardRules).map(([ruleNumber, ruleBody]) => (
+                  <ListItem
+                    key={ruleNumber}
+                    borderBottom="1px solid #ccc"
+                    py={2}
+                    display="flex"
+                    alignItems="flex-start"
+                    justifyContent="space-between"
+                  >
+                    <Box flex="1">
                       <strong>{`Rule ${ruleNumber}:`}</strong>
-                      <span className="text-left">{ruleDescription}</span>
-                    </ListItem>
-                  )
-                )}
+                      <Text mt={1} fontSize="sm">
+                        {ruleBody.description}
+                      </Text>
+                    </Box>
+                  </ListItem>
+                ))}
               </UnorderedList>
             </ModalBody>
           </ModalContent>
@@ -255,33 +257,84 @@ function App() {
           Transaction Details and Insights
         </Text>
 
-        {/* Transaction Table Section */}
-        {parsedTransactions && (
-          <Box>
-            <TableContainer>
-              <Table size={'md'} variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>Transaction</Th>
-                    <Th>Date</Th>
-                    <Th>Merchant Code</Th>
-                    <Th isNumeric>Amount (cents)</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {Object.entries(parsedTransactions).map(([key, value]) => (
-                    <Tr key={key}>
-                      <Td>{key}</Td>
-                      <Td>{value.date}</Td>
-                      <Td>{value.merchant_code}</Td>
-                      <Td isNumeric>{value.amount_cents}</Td>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '100%',
+            margin: '20px', // Add margin for spacing
+          }}
+        >
+          {/* Transaction Table Section */}
+          {parsedTransactions && (
+            <Card
+              width="48%" // Adjust width for spacing
+              align={'center'}
+              justify={'center'}
+              border={'1px solid'}
+              borderColor={'#004977'}
+              boxShadow="base"
+            >
+              <CardHeader fontSize="xl" mb="4">
+                Transactions
+              </CardHeader>
+              <TableContainer>
+                <Table size={'md'} variant="simple">
+                  <Thead>
+                    <Tr>
+                      <Th>Transaction</Th>
+                      <Th>Date</Th>
+                      <Th>Merchant Code</Th>
+                      <Th isNumeric>Amount (cents)</Th>
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </Box>
-        )}
+                  </Thead>
+                  <Tbody>
+                    {Object.entries(parsedTransactions).map(([key, value]) => (
+                      <Tr key={key}>
+                        <Td>{key}</Td>
+                        <Td>{value.date}</Td>
+                        <Td>{value.merchant_code}</Td>
+                        <Td isNumeric>{value.amount_cents}</Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </Card>
+          )}
+
+          <Card
+            width="48%" // Adjust width for spacing
+            align={'center'}
+            justify={'center'}
+            border={'1px solid'}
+            borderColor={'#004977'}
+            boxShadow="base"
+          >
+            <CardHeader fontSize="xl" mb="4">
+              Rules Used
+            </CardHeader>
+            <Table size={'md'} variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Rule</Th>
+                  <Th>Times Used</Th>
+                  <Th>Reward</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {Object.entries(rulesUsed).map(([key, value]) => (
+                  <Tr key={key}>
+                    <Td b>{key}</Td>
+                    <Td>x{value}</Td>
+                    <Td>{rewardRules[key].points} points</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Card>
+        </div>
 
         {/* Total Points Section within a Card */}
         <Card
@@ -298,36 +351,6 @@ function App() {
         </Card>
 
         {/* Reward Rules Section */}
-        <Card
-          width="60%"
-          align={'center'}
-          justify={'center'}
-          border={'4px solid'}
-          borderColor={'#004977'}
-          p={4}
-          boxShadow="base"
-        >
-          <Heading fontSize="xl">Rewards Used</Heading>
-
-          <Table size={'md'} variant="simple">
-            <Thead>
-              <Tr>
-                <Th>Rule</Th>
-                <Th>Times Used</Th>
-                <Th>Reward</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {Object.entries(rulesUsed).map(([key, value]) => (
-                <Tr key={key}>
-                  <Td b>{key}</Td>
-                  <Td>x{value}</Td>
-                  <Td>{rewardRules[key]}</Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </Card>
 
         <RulesModal />
 
@@ -526,12 +549,48 @@ function calculatePoints(transactions) {
   return calculateMaxValue(moneySpent, 0, new Set(), []);
 }
 
+// const rewardRules = {
+//   1: '500 points for every $75 spend at Sport Check, $25 spend at Tim Hortons, and $25 spend at Subway',
+//   2: '300 points for every $75 spend at Sport Check and $25 spend at Tim Hortons',
+//   3: '200 points for every $75 spend at Sport Check',
+//   4: '150 points for every $25 spend at Sport Check, $10 spend at Tim Hortons, and $10 spend at Subway',
+//   5: '75 points for every $25 spend at Sport Check and $10 spend at Tim Hortons',
+//   6: '75 points for every $20 spend at Sport Check',
+//   7: '1 point for every $1 spend for all other purchases (including leftover amount)',
+// };
+
 const rewardRules = {
-  1: '500 points for every $75 spend at Sport Check, $25 spend at Tim Hortons, and $25 spend at Subway',
-  2: '300 points for every $75 spend at Sport Check and $25 spend at Tim Hortons',
-  3: '200 points for every $75 spend at Sport Check',
-  4: '150 points for every $25 spend at Sport Check, $10 spend at Tim Hortons, and $10 spend at Subway',
-  5: '75 points for every $25 spend at Sport Check and $10 spend at Tim Hortons',
-  6: '75 points for every $20 spend at Sport Check',
-  7: '1 point for every $1 spend for all other purchases (including leftover amount)',
+  1: {
+    description:
+      '500 points for every $75 spend at Sport Check, $25 spend at Tim Hortons, and $25 spend at Subway',
+    points: 500,
+  },
+  2: {
+    description:
+      '300 points for every $75 spend at Sport Check and $25 spend at Tim Hortons',
+    points: 300,
+  },
+  3: {
+    description: '200 points for every $75 spend at Sport Check',
+    points: 200,
+  },
+  4: {
+    description:
+      '150 points for every $25 spend at Sport Check, $10 spend at Tim Hortons, and $10 spend at Subway',
+    points: 150,
+  },
+  5: {
+    description:
+      '75 points for every $25 spend at Sport Check and $10 spend at Tim Hortons',
+    points: 75,
+  },
+  6: {
+    description: '75 points for every $20 spend at Sport Check',
+    points: 75,
+  },
+  7: {
+    description:
+      '1 point for every $1 spend for all other purchases (including leftover amount)',
+    points: 1,
+  },
 };
