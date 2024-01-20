@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   ChakraProvider,
-  Input,
   theme,
   Box,
   Text,
@@ -15,10 +14,8 @@ import {
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
 } from '@chakra-ui/react';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
 
 function App() {
   const [transactions, setTransactions] = useState('');
