@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import ConfettiExplosion from 'react-confetti-explosion';
 import {
   ChakraProvider,
   theme,
@@ -15,7 +14,6 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
   Textarea,
