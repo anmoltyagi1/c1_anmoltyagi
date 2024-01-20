@@ -392,8 +392,8 @@ function App() {
 
         {/* Recalculate Button */}
         <Button
-          bgColor={'#004977'}
-          color={'white'}
+          border={'1px solid'}
+          color={'#004977'}
           onClick={() => {
             setIsTransactionInputted(false);
             setTransactions('');
