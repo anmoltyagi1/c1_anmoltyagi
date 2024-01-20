@@ -68,9 +68,9 @@ function App() {
           placeholder={`
           {
             "T01": {"date": "2021-05-01", "merchant_code" : "sportcheck", "amount_cents": 21000},
-            .
-            .
-            .`}
+            "T02": {"date": "2021-05-02", "merchant_code" : "sportcheck", "amount_cents": 8700},
+            "T03": {"date": "2021-05-03", "merchant_code" : "tim_hortons", "amount_cents": 323},
+          }`}
           onChange={event => {
             setTransactions(event.target.value.replace(/'/g, '"'));
 
@@ -98,8 +98,8 @@ function App() {
 
         <HStack spacing={4}>
           <Button
-            bgColor={'#004977'}
-            color={'white'}
+            color={'#004977'}
+            size={'sm'}
             onClick={() => {
               setTransactions(
                 JSON.stringify(
@@ -167,8 +167,42 @@ function App() {
           </Button>
 
           <Button
-            bgColor={'#004977'}
-            color={'white'}
+            color={'#004977'}
+            size={'sm'}
+            onClick={() => {
+              setTransactions(
+                JSON.stringify(
+                  {
+                    T1: {
+                      date: '2021-05-09',
+                      merchant_code: 'sportcheck',
+                      amount_cents: 2500,
+                    },
+                    T2: {
+                      date: '2021-05-10',
+                      merchant_code: 'tim_hortons',
+                      amount_cents: 1000,
+                    },
+                    T3: {
+                      date: '2021-05-10',
+                      merchant_code: 'the_bay',
+                      amount_cents: 500,
+                    },
+                  },
+                  null,
+                  2
+                )
+              );
+              setDisabledButton(false);
+            }}
+          >
+            Example 2
+          </Button>
+
+          <Button
+            color={'#004977'}
+            border={'1px solid'}
+            size={'sm'}
             onClick={() => {
               setTransactions(
                 JSON.stringify(
@@ -191,7 +225,7 @@ function App() {
               setDisabledButton(false);
             }}
           >
-            Example 2
+            Example 3
           </Button>
         </HStack>
 
@@ -328,7 +362,7 @@ function App() {
                   <Tr key={key}>
                     <Td b>{key}</Td>
                     <Td>x{value}</Td>
-                    <Td>{rewardRules[key].points} points</Td>
+                    <Td>{value * rewardRules[key].points} points</Td>
                   </Tr>
                 ))}
               </Tbody>
