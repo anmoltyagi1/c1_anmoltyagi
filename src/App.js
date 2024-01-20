@@ -99,6 +99,7 @@ function App() {
         <HStack spacing={4}>
           <Button
             color={'#004977'}
+            border={'1px solid'}
             size={'sm'}
             onClick={() => {
               setTransactions(
@@ -168,6 +169,7 @@ function App() {
 
           <Button
             color={'#004977'}
+            border={'1px solid'}
             size={'sm'}
             onClick={() => {
               setTransactions(
