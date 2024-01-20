@@ -87,7 +87,8 @@ function App() {
         />
 
         <Button
-          colorScheme="facebook"
+          bgColor={'#004977'}
+          color={'white'}
           onClick={handleTransactionInput}
           isDisabled={disableButton}
         >
@@ -96,7 +97,8 @@ function App() {
 
         <HStack spacing={4}>
           <Button
-            colorScheme="facebook"
+            bgColor={'#004977'}
+            color={'white'}
             onClick={() => {
               setTransactions(
                 JSON.stringify(
@@ -164,7 +166,8 @@ function App() {
           </Button>
 
           <Button
-            colorScheme="facebook"
+            bgColor={'#004977'}
+            color={'white'}
             onClick={() => {
               setTransactions(
                 JSON.stringify(
@@ -286,7 +289,7 @@ function App() {
           align={'center'}
           justify={'center'}
           border={'4px solid'}
-          borderColor={'blue.600'}
+          borderColor={'#004977'}
           p={4}
           boxShadow="base"
         >
@@ -300,7 +303,7 @@ function App() {
           align={'center'}
           justify={'center'}
           border={'4px solid'}
-          borderColor={'blue.600'}
+          borderColor={'#004977'}
           p={4}
           boxShadow="base"
         >
