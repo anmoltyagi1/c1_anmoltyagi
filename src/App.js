@@ -489,7 +489,7 @@ function calculatePoints(transactions) {
       const [newPoints, newMoney] = rules[i](Object.assign({}, moneyLeft));
       if (newPoints === 0) notToConsider.add(i + 1);
       if (newPoints > 0) {
-        if (i + 1 == 7) {
+        if (i + 1 === 7) {
           if (newUsed.hasOwnProperty(i + 1)) newUsed[i + 1] += newPoints;
           else newUsed[i + 1] = newPoints;
         } else {
