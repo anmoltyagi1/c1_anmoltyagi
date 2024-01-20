@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import ConfettiExplosion from 'react-confetti-explosion';
 import {
   ChakraProvider,
   theme,
   Box,
+  Card,
   Text,
+  HStack,
   Button,
   Heading,
   VStack,
   Table,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
   Textarea,
   Thead,
   Tbody,
@@ -15,6 +25,9 @@ import {
   Th,
   Td,
   TableContainer,
+  UnorderedList,
+  ListItem,
+  useDisclosure,
 } from '@chakra-ui/react';
 
 function App() {
@@ -43,8 +56,11 @@ function App() {
       <VStack spacing={4} align="center">
         <img src="Capital_One_logo.svg" width={250} alt="Capital One Logo" />
         <Heading size="lg">Enter Transaction History For a Month</Heading>
+        <Text fontSize="lg" fontWeight="bold">
+          Made By: Anmol Tyagi
+        </Text>
         <Textarea
-          size="lg"
+          size="sm"
           rows={15}
           height="auto"
           className="tw-w-full tw-h-full"
@@ -72,107 +88,109 @@ function App() {
         />
 
         <Button
-          colorScheme="teal"
+          colorScheme="facebook"
           onClick={handleTransactionInput}
           isDisabled={disableButton}
         >
           Calculate
         </Button>
 
-        <Button
-          colorScheme="teal"
-          onClick={() => {
-            setTransactions(
-              JSON.stringify(
-                {
-                  T1: {
-                    date: '2021-05-09',
-                    merchant_code: 'sportcheck',
-                    amount_cents: 7326,
+        <HStack spacing={4}>
+          <Button
+            colorScheme="facebook"
+            onClick={() => {
+              setTransactions(
+                JSON.stringify(
+                  {
+                    T01: {
+                      date: '2021-05-01',
+                      merchant_code: 'sportcheck',
+                      amount_cents: 21000,
+                    },
+                    T02: {
+                      date: '2021-05-02',
+                      merchant_code: 'sportcheck',
+                      amount_cents: 8700,
+                    },
+                    T03: {
+                      date: '2021-05-03',
+                      merchant_code: 'tim_hortons',
+                      amount_cents: 323,
+                    },
+                    T04: {
+                      date: '2021-05-04',
+                      merchant_code: 'tim_hortons',
+                      amount_cents: 1267,
+                    },
+                    T05: {
+                      date: '2021-05-05',
+                      merchant_code: 'tim_hortons',
+                      amount_cents: 2116,
+                    },
+                    T06: {
+                      date: '2021-05-06',
+                      merchant_code: 'tim_hortons',
+                      amount_cents: 2211,
+                    },
+                    T07: {
+                      date: '2021-05-07',
+                      merchant_code: 'subway',
+                      amount_cents: 1853,
+                    },
+                    T08: {
+                      date: '2021-05-08',
+                      merchant_code: 'subway',
+                      amount_cents: 2153,
+                    },
+                    T09: {
+                      date: '2021-05-09',
+                      merchant_code: 'sportcheck',
+                      amount_cents: 7326,
+                    },
+                    T10: {
+                      date: '2021-05-10',
+                      merchant_code: 'tim_hortons',
+                      amount_cents: 1321,
+                    },
                   },
-                  T2: {
-                    date: '2021-05-10',
-                    merchant_code: 'tim_hortons',
-                    amount_cents: 1321,
-                  },
-                },
-                null,
-                2
-              )
-            );
-            setDisabledButton(false);
-          }}
-        >
-          Example 1
-        </Button>
+                  null,
+                  2
+                )
+              );
+              setDisabledButton(false);
+            }}
+          >
+            {' '}
+            Example 1
+          </Button>
 
-        <Button
-          colorScheme="teal"
-          onClick={() => {
-            setTransactions(
-              JSON.stringify(
-                {
-                  T01: {
-                    date: '2021-05-01',
-                    merchant_code: 'sportcheck',
-                    amount_cents: 21000,
+          <Button
+            colorScheme="facebook"
+            onClick={() => {
+              setTransactions(
+                JSON.stringify(
+                  {
+                    T1: {
+                      date: '2021-05-09',
+                      merchant_code: 'sportcheck',
+                      amount_cents: 7326,
+                    },
+                    T2: {
+                      date: '2021-05-10',
+                      merchant_code: 'tim_hortons',
+                      amount_cents: 1321,
+                    },
                   },
-                  T02: {
-                    date: '2021-05-02',
-                    merchant_code: 'sportcheck',
-                    amount_cents: 8700,
-                  },
-                  T03: {
-                    date: '2021-05-03',
-                    merchant_code: 'tim_hortons',
-                    amount_cents: 323,
-                  },
-                  T04: {
-                    date: '2021-05-04',
-                    merchant_code: 'tim_hortons',
-                    amount_cents: 1267,
-                  },
-                  T05: {
-                    date: '2021-05-05',
-                    merchant_code: 'tim_hortons',
-                    amount_cents: 2116,
-                  },
-                  T06: {
-                    date: '2021-05-06',
-                    merchant_code: 'tim_hortons',
-                    amount_cents: 2211,
-                  },
-                  T07: {
-                    date: '2021-05-07',
-                    merchant_code: 'subway',
-                    amount_cents: 1853,
-                  },
-                  T08: {
-                    date: '2021-05-08',
-                    merchant_code: 'subway',
-                    amount_cents: 2153,
-                  },
-                  T09: {
-                    date: '2021-05-09',
-                    merchant_code: 'sportcheck',
-                    amount_cents: 7326,
-                  },
-                  T10: {
-                    date: '2021-05-10',
-                    merchant_code: 'tim_hortons',
-                    amount_cents: 1321,
-                  },
-                },
-                null,
-                2
-              )
-            );
-            setDisabledButton(false);
-          }}
-        >
-          {' '}
-          Example 2
-        </Button>
+                  null,
+                  2
+                )
+              );
+              setDisabledButton(false);
+            }}
+          >
+            Example 2
+          </Button>
+        </HStack>
 
         {disableButton && (
           <Text color="red">Please enter a valid JSON transaction</Text>
@@ -180,15 +198,66 @@ function App() {
       </VStack>
     );
   }
+  function RulesModal() {
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    return (
+      <div>
+        <Button bgColor="#004977" color="white" onClick={onOpen}>
+          Show Rules
+        </Button>
+
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent
+            bg="white"
+            borderRadius="md"
+            boxShadow="md"
+            p={4}
+            maxWidth="4xl"
+          >
+            <ModalHeader>Reward Rules</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <UnorderedList listStyleType="none" pl={0}>
+                {Object.entries(rewardRules).map(
+                  ([ruleNumber, ruleDescription]) => (
+                    <ListItem
+                      key={ruleNumber}
+                      borderBottom="1px solid #ccc"
+                      py={2}
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      textAlign="left"
+                    >
+                      <strong>{`Rule ${ruleNumber}:`}</strong>
+                      <span className="text-left">{ruleDescription}</span>
+                    </ListItem>
+                  )
+                )}
+              </UnorderedList>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      </div>
+    );
+  }
 
   function renderDifferentUI() {
-    const value = calculatePoints(parsedTransactions);
+    const [value, rulesUsed] = calculatePoints(parsedTransactions);
+
     return (
       <VStack spacing={4} align="center">
+        {/* Title Section */}
+        <Text fontSize="2xl" fontWeight="bold">
+          Transaction Details and Insights
+        </Text>
+
+        {/* Transaction Table Section */}
         {parsedTransactions && (
           <Box>
             <TableContainer>
-              <Table variant="simple">
+              <Table size={'md'} variant="simple">
                 <Thead>
                   <Tr>
                     <Th>Transaction</Th>
@@ -212,9 +281,57 @@ function App() {
           </Box>
         )}
 
-        <Text fontSize="xl">Total Points: {value}</Text>
+        {/* Total Points Section within a Card */}
+        <Card
+          width="30%"
+          align={'center'}
+          justify={'center'}
+          border={'4px solid'}
+          borderColor={'blue.600'}
+          p={4}
+          boxShadow="base"
+        >
+          <Heading fontSize="xl">Total Points Earned: {value}</Heading>
+        </Card>
 
+        {/* Reward Rules Section */}
+        <Card
+          width="60%"
+          align={'center'}
+          justify={'center'}
+          border={'4px solid'}
+          borderColor={'blue.600'}
+          p={4}
+          boxShadow="base"
+        >
+          <Heading fontSize="xl">Rewards Used</Heading>
+
+          <Table size={'md'} variant="simple">
+            <Thead>
+              <Tr>
+                <Th>Rule</Th>
+                <Th>Times Used</Th>
+                <Th>Reward</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {Object.entries(rulesUsed).map(([key, value]) => (
+                <Tr key={key}>
+                  <Td b>{key}</Td>
+                  <Td>x{value}</Td>
+                  <Td>{rewardRules[key]}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Card>
+
+        <RulesModal />
+
+        {/* Recalculate Button */}
         <Button
+          bgColor={'#004977'}
+          color={'white'}
           onClick={() => {
             setIsTransactionInputted(false);
             setTransactions('');
@@ -352,7 +469,7 @@ function calculatePoints(transactions) {
         break;
       }
       if (index === Object.keys(moneyLeft).length - 1) {
-        return points;
+        return [points, used];
       }
       index += 1;
     }
@@ -364,34 +481,54 @@ function calculatePoints(transactions) {
       return dp.get(JSON.stringify([moneyLeft, notToConsider]));
     }
 
+    let resultMap = Object.assign({}, used);
+
     for (let i = 0; i < rules.length; i++) {
       if (notToConsider.has(i + 1)) {
         continue;
       }
+      let newUsed = Object.assign({}, used);
       const [newPoints, newMoney] = rules[i](Object.assign({}, moneyLeft));
       if (newPoints === 0) notToConsider.add(i + 1);
+      if (newPoints > 0) {
+        if (i + 1 == 7) {
+          if (newUsed.hasOwnProperty(i + 1)) newUsed[i + 1] += newPoints;
+          else newUsed[i + 1] = newPoints;
+        } else {
+          if (newUsed.hasOwnProperty(i + 1)) newUsed[i + 1] += 1;
+          else newUsed[i + 1] = 1;
+        }
+      }
 
-      // Log new points and rule applied
-      // if (newPoints) console.log(newPoints, "rule: ", i + 1, " ", newMoney);
-
-      maximumPoints = Math.max(
-        maximumPoints,
-        calculateMaxValue(
-          newMoney,
-          points + newPoints,
-          new Set(notToConsider),
-          [...used, i + 1]
-        )
+      let result = calculateMaxValue(
+        newMoney,
+        points + newPoints,
+        new Set(notToConsider),
+        newUsed
       );
-      dp.set(JSON.stringify([newMoney, notToConsider]), maximumPoints);
+      if (result[0] > maximumPoints) {
+        maximumPoints = result[0];
+        resultMap = result[1];
+      }
+
+      dp.set(JSON.stringify([newMoney, notToConsider]), [
+        maximumPoints,
+        resultMap,
+      ]);
     }
     // console.log(maximumPoints, used);
-    return maximumPoints;
+    return [maximumPoints, resultMap];
   }
 
   return calculateMaxValue(moneySpent, 0, new Set(), []);
 }
 
-// {
-//   'T1': {'date': '2021-05-09', 'merchant_code' : 'sportcheck', 'amount_cents': 7326}, 'T2': {'date': '2021-05-10', 'merchant_code' : 'tim_hortons', 'amount_cents': 1321}
-//   }
+const rewardRules = {
+  1: '500 points for every $75 spend at Sport Check, $25 spend at Tim Hortons, and $25 spend at Subway',
+  2: '300 points for every $75 spend at Sport Check and $25 spend at Tim Hortons',
+  3: '200 points for every $75 spend at Sport Check',
+  4: '150 points for every $25 spend at Sport Check, $10 spend at Tim Hortons, and $10 spend at Subway',
+  5: '75 points for every $25 spend at Sport Check and $10 spend at Tim Hortons',
+  6: '75 points for every $20 spend at Sport Check',
+  7: '1 point for every $1 spend for all other purchases (including leftover amount)',
+};
