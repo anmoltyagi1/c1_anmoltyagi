@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ConfettiExplosion from 'react-confetti-explosion';
 import {
   ChakraProvider,
   theme,
@@ -289,6 +290,7 @@ function App() {
           p={4}
           boxShadow="base"
         >
+          <ConfettiExplosion duration={3000} colors={['#d03027', '#004977']} />
           <Heading fontSize="xl">Total Points Earned: {value}</Heading>
         </Card>
 
