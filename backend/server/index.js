@@ -1,6 +1,6 @@
 const calculatePoints = require("./calculatePoints.js");
 const express = require("express");
-const PORT = process.env.PORT || 3001;
+// const PORT = process.env.PORT || 3001;
 const app = express();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
@@ -8,9 +8,9 @@ const prisma = new PrismaClient();
 // Middleware to parse JSON in the request body
 app.use(express.json());
 
-app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server listening on ${PORT}`);
+// });
 
 app.get("/api", (req, res) => {
   res.json({ message: "Hello from Express!" });
