@@ -2,18 +2,8 @@ const calculatePoints = require("./calculatePoints.js");
 const express = require("express");
 const PORT = process.env.PORT || 3001;
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
 
 // Middleware to parse JSON in the request body
 app.use(express.json());
@@ -39,3 +29,5 @@ app.post("/calculate", async (req, res) => {
       .json({ message: "Error calculating points", error: error.message });
   }
 });
+
+module.exports = app;
