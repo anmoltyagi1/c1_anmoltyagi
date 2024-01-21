@@ -472,7 +472,7 @@ const rewardRules = {
 
 async function fetchData(parsedTransactions) {
   try {
-    const response = await fetch('/calculate', {
+    const response = await fetch('http://178.128.239.147:3001/calculate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -487,3 +487,5 @@ async function fetchData(parsedTransactions) {
     throw error; // Rethrow the error to handle it elsewhere if needed
   }
 }
+
+// http://178.128.239.147:3001/calculate
