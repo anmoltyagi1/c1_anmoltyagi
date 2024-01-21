@@ -2,9 +2,9 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node api/index.js",
+    "start": "vercel dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -18,9 +18,5 @@
   },
   "devDependencies": {
     "prisma": "^5.8.1"
-  },
-  "engines": {
-    "node": "18.x",
-    "npm": "6.14.7"
   }
 }

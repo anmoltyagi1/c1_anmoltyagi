@@ -1,23 +1,22 @@
 const calculatePoints = require("./calculatePoints.js");
-const express = require("express");
 // const serverless = require("serverless-http");
 const PORT = process.env.PORT || 3001;
-const app = express();
+const { Router } = require("express");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const r = Router();
 
 // Middleware to parse JSON in the request body
-app.use(express.json());
 
-app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
-
-app.get("/api", (req, res) => {
+r.get("/api", (req, res) => {
   res.json({ message: "Hello from Express!" });
 });
 
-app.post("/calculate", async (req, res) => {
+r.get("/", (req, res) => {
+  res.json({ message: "This is a test" });
+});
+
+r.post("/calculate", async (req, res) => {
   try {
     const { transactions } = req.body;
     const result = await calculatePoints(transactions);
@@ -31,5 +30,4 @@ app.post("/calculate", async (req, res) => {
   }
 });
 
-// module.exports.handler = serverless(app);
-module.exports = app;
+module.exports = r;
