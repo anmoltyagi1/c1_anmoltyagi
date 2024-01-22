@@ -4,6 +4,8 @@
 
 ### Live Demo: http://178.128.239.147:3000/
 
+### Demo Video: https://youtu.be/t5SHnzaPrVQ
+
 This project is a MERN full-stack application designed to calculate the maximum points a user can earn based on their monthly transactions. Users enter their transactions in JSON format, and the application applies specific rules to determine the points earned for each transaction and the total points for the month.
 
 ![Alt text](image.png)
