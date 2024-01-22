@@ -2,6 +2,8 @@
 
 ## Overview
 
+### Live Demo: http://178.128.239.147:3000/
+
 This project is a MERN full-stack application designed to calculate the maximum points a user can earn based on their monthly transactions. Users enter their transactions in JSON format, and the application applies specific rules to determine the points earned for each transaction and the total points for the month.
 
 ## Rules for Point Calculation
@@ -35,8 +37,8 @@ The application is built using the MERN stack (MongoDB, Express, React, Node). P
 
 3. **Run the Application:**
 
-   - Run `npm start` in the project directory to start the backend server.
-   - Navigate to the `client` directory and run `npm start` to start the React frontend.
+   - Run `npm start` in the server directory to start the backend server.
+   - Navigate to the `frontend` directory and run `npm start` to start the React frontend.
 
 4. **Usage:**
    - Access the application in your web browser.
