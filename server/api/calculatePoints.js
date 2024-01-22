@@ -21,6 +21,7 @@ async function calculatePoints(transactions) {
     const merchantToPrice = {
       [transaction.merchant_code]: Math.floor(transaction.amount_cents / 100),
     };
+
     transactionPoints.push(
       calculateMaxPoints(merchantToPrice, 0, new Set(), [])
     );
@@ -53,6 +54,7 @@ async function calculatePoints(transactions) {
     }
 
     const { ruleDefinition, points } = rule;
+    const remainingMoneyCopy = Object.assign({}, remainingMoney);
 
     for (const merchant in ruleDefinition) {
       if (
@@ -61,9 +63,9 @@ async function calculatePoints(transactions) {
       ) {
         return [0, remainingMoney];
       }
-      remainingMoney[merchant] -= ruleDefinition[merchant];
+      remainingMoneyCopy[merchant] -= ruleDefinition[merchant];
     }
-    return [points, remainingMoney];
+    return [points, remainingMoneyCopy];
   }
 
   // Calculate maximum value considering different rules
@@ -74,6 +76,7 @@ async function calculatePoints(transactions) {
     usedRules
   ) {
     let index = 0;
+    // Check to see if rules can be applied
     for (const merchant in remainingMoney) {
       if (remainingMoney[merchant] > 1) {
         break;
@@ -103,7 +106,9 @@ async function calculatePoints(transactions) {
         Object.assign({}, remainingMoney)
       );
 
-      if (newPoints === 0) excludedRules.add(i + 1);
+      if (newPoints === 0) {
+        excludedRules.add(i + 1);
+      }
       if (newPoints > 0) {
         newUsedRules[extractedRules[i].number] =
           newUsedRules[extractedRules[i].number] || 0;
@@ -131,7 +136,6 @@ async function calculatePoints(transactions) {
     return [maxPoints, resultMap];
   }
 
-  console.log(transactionPoints);
   const result = calculateMaxPoints(moneySpent, 0, new Set(), []);
   return [result, transactionPoints];
 }
