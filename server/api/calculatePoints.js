@@ -4,13 +4,13 @@ const prisma = new PrismaClient();
 async function calculatePoints(transactions) {
   // Retrieve rules from the database
   const rulesFromDB = await prisma.rules.findMany({});
-  const extractedRules = rulesFromDB.slice();
+  const rules = rulesFromDB.slice();
 
   // Dynamic programming memoization
   const memoizationMap = new Map();
 
   // Track money spent for each merchant
-  const moneySpent = {};
+  const totalMoneySpentPerMerchant = {};
 
   // Calculate points for each transaction
   const transactionPoints = [];
@@ -22,6 +22,7 @@ async function calculatePoints(transactions) {
       [transaction.merchant_code]: Math.floor(transaction.amount_cents / 100),
     };
 
+    // Add points for each transaction
     transactionPoints.push(
       calculateMaxPoints(merchantToPrice, 0, new Set(), [])
     );
@@ -29,15 +30,16 @@ async function calculatePoints(transactions) {
     const merchantCode = transaction.merchant_code;
     const amountInDollars = transaction.amount_cents / 100;
 
-    moneySpent[merchantCode] =
-      (moneySpent[merchantCode] || 0) + amountInDollars;
+    totalMoneySpentPerMerchant[merchantCode] =
+      (totalMoneySpentPerMerchant[merchantCode] || 0) + amountInDollars;
   }
 
-  // Round money spent for each merchant to the nearest dollar
-  for (const transactionId in transactions) {
-    moneySpent[transactions[transactionId].merchant_code] = Math.floor(
-      moneySpent[transactions[transactionId].merchant_code]
-    );
+  // Round money spent for each merchant to the nearest dollar and add to hashmap
+  for (const transaction in transactions) {
+    totalMoneySpentPerMerchant[transactions[transaction].merchant_code] =
+      Math.floor(
+        totalMoneySpentPerMerchant[transactions[transaction].merchant_code]
+      );
   }
 
   // Function to check if a rule is valid and calculate points
@@ -54,16 +56,18 @@ async function calculatePoints(transactions) {
     }
 
     const { ruleDefinition, points } = rule;
-    const remainingMoneyCopy = Object.assign({}, remainingMoney);
+    const remainingMoneyCopy = Object.assign({}, remainingMoney); // create a copy of the remaining money
 
     for (const merchant in ruleDefinition) {
+      // iterate over the merchant in the rule
       if (
         !remainingMoney.hasOwnProperty(merchant) ||
         remainingMoney[merchant] < ruleDefinition[merchant]
       ) {
+        // if the merchant is not in the remaining money or the remaining money is less than the rule definition
         return [0, remainingMoney];
       }
-      remainingMoneyCopy[merchant] -= ruleDefinition[merchant];
+      remainingMoneyCopy[merchant] -= ruleDefinition[merchant]; // subtract the rule definition from the remaining money
     }
     return [points, remainingMoneyCopy];
   }
@@ -76,12 +80,13 @@ async function calculatePoints(transactions) {
     usedRules
   ) {
     let index = 0;
-    // Check to see if rules can be applied
+    // Check to see if rules can be applied (BASE CASE)
     for (const merchant in remainingMoney) {
       if (remainingMoney[merchant] > 1) {
         break;
       }
       if (index === Object.keys(remainingMoney).length - 1) {
+        // if the index is equal to the length of the remaining money then return the points and used rules
         return [points, usedRules];
       }
       index += 1;
@@ -91,32 +96,36 @@ async function calculatePoints(transactions) {
     let resultMap = Object.assign({}, usedRules);
 
     if (memoizationMap.has(JSON.stringify([remainingMoney, excludedRules]))) {
+      // if the memoization map has the remaining money and excluded rules
       return memoizationMap.get(
         JSON.stringify([remainingMoney, excludedRules])
       );
     }
 
-    for (let i = 0; i < extractedRules.length; i++) {
+    for (let i = 0; i < rules.length; i++) {
+      // iterate over the extracted rules
       if (excludedRules.has(i + 1)) {
         continue;
       }
       let newUsedRules = Object.assign({}, usedRules);
       const [newPoints, newRemainingMoney] = isValidRule(
-        extractedRules[i],
+        // check if the rule is valid and applies
+        rules[i],
         Object.assign({}, remainingMoney)
       );
 
       if (newPoints === 0) {
+        // if the rule doesn't work, add it to the excluded rules
         excludedRules.add(i + 1);
       }
       if (newPoints > 0) {
-        newUsedRules[extractedRules[i].number] =
-          newUsedRules[extractedRules[i].number] || 0;
-        newUsedRules[extractedRules[i].number] +=
-          extractedRules[i].number === 7 ? newPoints : 1;
+        // if the rule works, add it to the used rules
+        newUsedRules[rules[i].number] = newUsedRules[rules[i].number] || 0;
+        newUsedRules[rules[i].number] += rules[i].number === 7 ? newPoints : 1;
       }
 
       let result = calculateMaxPoints(
+        // recursively call the function
         newRemainingMoney,
         points + newPoints,
         new Set(excludedRules),
@@ -124,6 +133,7 @@ async function calculatePoints(transactions) {
       );
 
       if (result[0] > maxPoints) {
+        // if the result is greater than the max points, update the max points and result map
         maxPoints = result[0];
         resultMap = result[1];
       }
@@ -131,12 +141,17 @@ async function calculatePoints(transactions) {
       memoizationMap.set(JSON.stringify([newRemainingMoney, excludedRules]), [
         maxPoints,
         resultMap,
-      ]);
+      ]); // add the result to the memoization map
     }
     return [maxPoints, resultMap];
   }
 
-  const result = calculateMaxPoints(moneySpent, 0, new Set(), []);
+  const result = calculateMaxPoints(
+    totalMoneySpentPerMerchant,
+    0,
+    new Set(),
+    []
+  );
   return [result, transactionPoints];
 }
 
