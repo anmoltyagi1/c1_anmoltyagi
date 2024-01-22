@@ -2,131 +2,138 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function calculatePoints(transactions) {
+  // Retrieve rules from the database
+  const rulesFromDB = await prisma.rules.findMany({});
+  const extractedRules = rulesFromDB.slice();
+
+  // Dynamic programming memoization
+  const memoizationMap = new Map();
+
+  // Track money spent for each merchant
   const moneySpent = {};
+
+  // Calculate points for each transaction
+  const transactionPoints = [];
+
+  // Calculate money spent for each merchant and populate transactionPoints
   for (const transactionId in transactions) {
     const transaction = transactions[transactionId];
+    const merchantToPrice = {
+      [transaction.merchant_code]: Math.floor(transaction.amount_cents / 100),
+    };
+    transactionPoints.push(
+      calculateMaxPoints(merchantToPrice, 0, new Set(), [])
+    );
+
     const merchantCode = transaction.merchant_code;
     const amountInDollars = transaction.amount_cents / 100;
 
-    if (moneySpent.hasOwnProperty(merchantCode)) {
-      // Merchant code already exists in moneySpent, add to the existing amount
-      moneySpent[merchantCode] += amountInDollars;
-    } else {
-      // Merchant code is not in moneySpent, create a new entry
-      moneySpent[merchantCode] = amountInDollars;
-    }
+    moneySpent[merchantCode] =
+      (moneySpent[merchantCode] || 0) + amountInDollars;
   }
 
+  // Round money spent for each merchant to the nearest dollar
   for (const transactionId in transactions) {
     moneySpent[transactions[transactionId].merchant_code] = Math.floor(
       moneySpent[transactions[transactionId].merchant_code]
     );
   }
 
-  // Rules
-  const rulesFromDB = await prisma.rules.findMany({});
-  const rulesExtracted = [];
-
-  for (const rule of rulesFromDB) {
-    rulesExtracted.push(rule);
-  }
-
-  function isRuleValid(rule, moneyLeft) {
+  // Function to check if a rule is valid and calculate points
+  function isValidRule(rule, remainingMoney) {
     if (rule.number === 7) {
       let points = 0;
-      for (const i in moneyLeft) {
-        if (moneyLeft[i] >= 1) {
-          points += moneyLeft[i];
-          moneyLeft[i] = 0;
+      for (const merchant in remainingMoney) {
+        if (remainingMoney[merchant] >= 1) {
+          points += remainingMoney[merchant];
+          remainingMoney[merchant] = 0;
         }
       }
-      return [points, moneyLeft];
+      return [points, remainingMoney];
     }
-    if (rule.number === 3) console.log(rule, moneyLeft, rule.ruleDefinition);
 
     const { ruleDefinition, points } = rule;
 
-    for (const key in ruleDefinition) {
-      if (!moneyLeft.hasOwnProperty(key)) return [0, moneyLeft];
-      if (moneyLeft[key] < ruleDefinition[key]) {
-        return [0, moneyLeft];
+    for (const merchant in ruleDefinition) {
+      if (
+        !remainingMoney.hasOwnProperty(merchant) ||
+        remainingMoney[merchant] < ruleDefinition[merchant]
+      ) {
+        return [0, remainingMoney];
       }
-      moneyLeft[key] -= ruleDefinition[key];
+      remainingMoney[merchant] -= ruleDefinition[merchant];
     }
-    if (rule.number === 3) console.log("here");
-    return [points, moneyLeft];
+    return [points, remainingMoney];
   }
 
-  const dp = new Map();
-  console.log(moneySpent);
-
   // Calculate maximum value considering different rules
-  function calculateMaxValue(moneyLeft, points, notToConsider, used) {
+  function calculateMaxPoints(
+    remainingMoney,
+    points,
+    excludedRules,
+    usedRules
+  ) {
     let index = 0;
-    for (const merchant in moneyLeft) {
-      if (moneyLeft[merchant] > 1) {
+    for (const merchant in remainingMoney) {
+      if (remainingMoney[merchant] > 1) {
         break;
       }
-      if (index === Object.keys(moneyLeft).length - 1) {
-        return [points, used];
+      if (index === Object.keys(remainingMoney).length - 1) {
+        return [points, usedRules];
       }
       index += 1;
     }
 
-    let maximumPoints = 0;
+    let maxPoints = 0;
+    let resultMap = Object.assign({}, usedRules);
 
-    // Correct Map usage
-    if (dp.has(JSON.stringify([moneyLeft, notToConsider]))) {
-      return dp.get(JSON.stringify([moneyLeft, notToConsider]));
+    if (memoizationMap.has(JSON.stringify([remainingMoney, excludedRules]))) {
+      return memoizationMap.get(
+        JSON.stringify([remainingMoney, excludedRules])
+      );
     }
 
-    let resultMap = Object.assign({}, used);
-
-    for (let i = 0; i < rulesExtracted.length; i++) {
-      if (notToConsider.has(i + 1)) {
+    for (let i = 0; i < extractedRules.length; i++) {
+      if (excludedRules.has(i + 1)) {
         continue;
       }
-      let newUsed = Object.assign({}, used);
-      const [newPoints, newMoney] = isRuleValid(
-        rulesExtracted[i],
-        Object.assign({}, moneyLeft)
+      let newUsedRules = Object.assign({}, usedRules);
+      const [newPoints, newRemainingMoney] = isValidRule(
+        extractedRules[i],
+        Object.assign({}, remainingMoney)
       );
 
-      if (newPoints === 0) notToConsider.add(i + 1);
+      if (newPoints === 0) excludedRules.add(i + 1);
       if (newPoints > 0) {
-        if (rulesExtracted[i].number === 7) {
-          if (newUsed.hasOwnProperty(rulesExtracted[i].number))
-            newUsed[rulesExtracted[i].number] += newPoints;
-          else newUsed[rulesExtracted[i].number] = newPoints;
-        } else {
-          if (newUsed.hasOwnProperty(rulesExtracted[i].number))
-            newUsed[rulesExtracted[i].number] += 1;
-          else newUsed[rulesExtracted[i].number] = 1;
-        }
+        newUsedRules[extractedRules[i].number] =
+          newUsedRules[extractedRules[i].number] || 0;
+        newUsedRules[extractedRules[i].number] +=
+          extractedRules[i].number === 7 ? newPoints : 1;
       }
 
-      let result = calculateMaxValue(
-        newMoney,
+      let result = calculateMaxPoints(
+        newRemainingMoney,
         points + newPoints,
-        new Set(notToConsider),
-        newUsed
+        new Set(excludedRules),
+        newUsedRules
       );
-      if (result[0] > maximumPoints) {
-        maximumPoints = result[0];
+
+      if (result[0] > maxPoints) {
+        maxPoints = result[0];
         resultMap = result[1];
       }
 
-      dp.set(JSON.stringify([newMoney, notToConsider]), [
-        maximumPoints,
+      memoizationMap.set(JSON.stringify([newRemainingMoney, excludedRules]), [
+        maxPoints,
         resultMap,
       ]);
     }
-    // console.log(maximumPoints, used);
-    return [maximumPoints, resultMap];
+    return [maxPoints, resultMap];
   }
 
-  const value = calculateMaxValue(moneySpent, 0, new Set(), []);
-  return value;
+  console.log(transactionPoints);
+  const result = calculateMaxPoints(moneySpent, 0, new Set(), []);
+  return [result, transactionPoints];
 }
 
 module.exports = calculatePoints;

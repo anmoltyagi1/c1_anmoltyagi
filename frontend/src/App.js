@@ -26,6 +26,7 @@ import {
   TableContainer,
   UnorderedList,
   ListItem,
+  Spinner,
   useDisclosure,
   CardHeader,
 } from '@chakra-ui/react';
@@ -35,16 +36,19 @@ function App() {
   const [isTransactionInputted, setIsTransactionInputted] = useState(false);
   const [parsedTransactions, setParsedTransactions] = useState(null);
   const [disableButton, setDisabledButton] = useState(true);
-  const [value, setValue] = useState(0);
-  const [rulesUsed, setRulesUsed] = useState({});
+  const [value, setValue] = useState(null);
+  const [rulesUsed, setRulesUsed] = useState(null);
+  const [transactionPoints, setTransactionPoints] = useState(null);
 
   useEffect(() => {
+    if (!parsedTransactions) return;
     const fetchDataAndSetState = async () => {
       try {
         const result = await fetchData(parsedTransactions);
-        console.log('result :', result);
-        const [resultValue, resultRulesUsed] = result;
+        const [resultValue, resultRulesUsed] = result[0];
+        const transactionPoints = result[1];
 
+        setTransactionPoints(transactionPoints);
         setValue(resultValue);
         setRulesUsed(resultRulesUsed);
       } catch (error) {
@@ -58,6 +62,7 @@ function App() {
 
   function handleTransactionInput() {
     try {
+      setRulesUsed(null);
       let parsed = JSON.parse(transactions);
       setParsedTransactions(parsed);
       setIsTransactionInputted(true);
@@ -70,7 +75,12 @@ function App() {
     return (
       <VStack spacing={4} align="center">
         <img src="Capital_One_logo.svg" width={250} alt="Capital One Logo" />
-        <Heading size="lg">Enter Transaction History For a Month</Heading>
+        <Heading size="2xl">Points Calculator</Heading>
+
+        <Heading size="sm">
+          Enter your transactions in the box below for a specific month to
+          calculate your points
+        </Heading>
         <Text fontSize="lg" fontWeight="bold">
           Made By: Anmol Tyagi
         </Text>
@@ -309,6 +319,28 @@ function App() {
                 Transaction Details and Insights
               </Text>
 
+              {/* Total Points Section within a Card */}
+              <Card
+                width="30%"
+                align={'center'}
+                justify={'center'}
+                border={'4px solid'}
+                borderColor={'#004977'}
+                p={4}
+                boxShadow="base"
+              >
+                {value && (
+                  <ConfettiExplosion
+                    force={0.2}
+                    duration={3000}
+                    colors={['#d03027', '#004977']}
+                  />
+                )}
+                <Heading fontSize="xl">
+                  Total Points Earned: {value ? value : <Spinner />}
+                </Heading>
+              </Card>
+
               <div
                 style={{
                   display: 'flex',
@@ -367,8 +399,43 @@ function App() {
                   boxShadow="base"
                 >
                   <CardHeader fontSize="xl" mb="4">
-                    Rules Used
+                    Transaction Points
                   </CardHeader>
+                  {rulesUsed ? (
+                    <Table size={'md'} variant="simple">
+                      <Thead>
+                        <Tr>
+                          <Th>Transaction</Th>
+                          <Th>Points</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {transactionPoints.map((transactionPoint, index) => (
+                          <Tr key={index}>
+                            <Td>T{index + 1}</Td>
+                            <Td>{transactionPoint[0]}</Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  ) : (
+                    <Spinner />
+                  )}
+                </Card>
+              </div>
+
+              <Card
+                width="48%" // Adjust width for spacing
+                align={'center'}
+                justify={'center'}
+                border={'1px solid'}
+                borderColor={'#004977'}
+                boxShadow="base"
+              >
+                <CardHeader fontSize="xl" mb="4">
+                  Rules Used
+                </CardHeader>
+                {rulesUsed ? (
                   <Table size={'md'} variant="simple">
                     <Thead>
                       <Tr>
@@ -387,24 +454,9 @@ function App() {
                       ))}
                     </Tbody>
                   </Table>
-                </Card>
-              </div>
-
-              {/* Total Points Section within a Card */}
-              <Card
-                width="30%"
-                align={'center'}
-                justify={'center'}
-                border={'4px solid'}
-                borderColor={'#004977'}
-                p={4}
-                boxShadow="base"
-              >
-                <ConfettiExplosion
-                  duration={3000}
-                  colors={['#d03027', '#004977']}
-                />
-                <Heading fontSize="xl">Total Points Earned: {value}</Heading>
+                ) : (
+                  <Spinner />
+                )}
               </Card>
 
               {/* Reward Rules Section */}
@@ -416,6 +468,7 @@ function App() {
                 border={'1px solid'}
                 color={'#004977'}
                 onClick={() => {
+                  setValue(null);
                   setIsTransactionInputted(false);
                   setTransactions('');
                 }}
@@ -472,7 +525,7 @@ const rewardRules = {
 
 async function fetchData(parsedTransactions) {
   try {
-    const response = await fetch('http://178.128.239.147:3001/calculate', {
+    const response = await fetch('/calculate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -481,11 +534,10 @@ async function fetchData(parsedTransactions) {
     });
 
     const data = await response.json();
+
     return data.result; // Assuming data.result is an array
   } catch (error) {
     console.error('Error:', error);
     throw error; // Rethrow the error to handle it elsewhere if needed
   }
 }
-
-// http://178.128.239.147:3001/calculate
